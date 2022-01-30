@@ -58,7 +58,7 @@ import supybot.callbacks as callbacks
 import supybot.schedule as schedule
 import supybot.registry as registry
 from ftfy.badness import sequence_weirdness
-from ftfy.badness import text_cost
+#from ftfy.badness import text_cost
 try:
     from supybot.i18n import PluginInternationalization
     _ = PluginInternationalization('Sigyn')
@@ -3966,4 +3966,3 @@ class Sigyn(callbacks.Plugin,plugins.ChannelDBHandler):
         return db
 
 Class = Sigyn
-
