@@ -1280,7 +1280,7 @@ class Sigyn(callbacks.Plugin,plugins.ChannelDBHandler):
             i.opered = True
             irc.queueMsg(ircmsgs.IrcMsg('MODE %s +O' % irc.nick))
             irc.queueMsg(ircmsgs.IrcMsg('MODE %s +B' % irc.nick))
-            irc.queueMsg(ircmsgs.IrcMsg('CAP REQ :solanum.chat/realhost'))
+#            irc.queueMsg(ircmsgs.IrcMsg('CAP REQ :solanum.chat/realhost'))
             try:
                 conf.supybot.protocols.irc.throttleTime.setValue(0.0)
             except:
