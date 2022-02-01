@@ -91,7 +91,7 @@ def isCloaked (prefix,sig):
         return False
     (nick,ident,host) = ircutils.splitHostmask(prefix)
     if '/' in host:
-        if host.startswith('gateway/') or host.startswith('nat/'):
+        if host.startswith('gateway/') or host.startswith('IRC4Fun-'):
             return False
         return True
     return False
@@ -1980,11 +1980,11 @@ class Sigyn(callbacks.Plugin,plugins.ChannelDBHandler):
             raw = text
         text = raw.lower()
         ip = None
-        if 'solanum.chat/ip' in msg.server_tags:
-            ip = msg.server_tags['solanum.chat/ip']
-        if ip is None:
-            if 'solanum.chat/realhost' in msg.server_tags:
-                ip = msg.server_tags['solanum.chat/realhost']
+#        if 'solanum.chat/ip' in msg.server_tags:
+#            ip = msg.server_tags['solanum.chat/ip']
+#        if ip is None:
+#            if 'solanum.chat/realhost' in msg.server_tags:
+#                ip = msg.server_tags['solanum.chat/realhost']
         mask = None
         if ip:
             (ni,ident,hos) = ircutils.splitHostmask(msg.prefix)
