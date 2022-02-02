@@ -1,4 +1,4 @@
-# Sigyn
+# ozone (Sigyn)
 
 A Limnoria plugin to handle spam and abuse on a network level.
 
@@ -6,9 +6,10 @@ A Limnoria plugin to handle spam and abuse on a network level.
 
 The best way is to discuss with a staffer, you could also ask for her presence temporary (duration varies), with an `/invite ozone` (reviewed by staff).
 
-But as invite notification can be missed, feel free to join `#libera-bots` and ask in there.
+But as invite notification can be missed, feel free to join `#bots` and ask in there.
 
 If opped in your channel you can ask Sigyn to unkline an user, `/msg ozone unkline <nick>`, you have a dozen minutes to do so after the kill/kline, it only works if the user was banned due to abuse detected in your channel.
+
 
 ## Code of Conduct
 
