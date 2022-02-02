@@ -1422,8 +1422,8 @@ class Sigyn(callbacks.Plugin,plugins.ChannelDBHandler):
             self.logChannel(irc,"INFO: not opered, can't kill %s" % nick)
             return
         if not reason:
-            reason = self.registryValue('killMessage')
-        irc.sendMsg(ircmsgs.IrcMsg('KILL %s :%s' % (nick,reason)))
+            reason = self.registryValue('klineMessage')
+        irc.sendMsg(ircmsgs.IrcMsg('PRIVMSG OperServ :AKILL ADD +5h %s %s' % (nick,reason)))
 
     def do338 (self,irc,msg):
         i = self.getIrc(irc)
