@@ -586,7 +586,7 @@ class Sigyn(callbacks.Plugin,plugins.ChannelDBHandler):
                 irc.reply('Already in defcon mode, reset, %ss more' % self.registryValue('defcon'))
             else:
                 i.defcon = time.time()
-                self.logChannel(irc,"INFO: ignores lifted and abuses end to klines for %ss by %s" % (self.registryValue('defcon'),msg.nick))
+                self.logChannel(irc,"INFO: ignores lifted and abuses end to glines for %ss by %s" % (self.registryValue('defcon'),msg.nick))
                 if not i.god:
                     irc.sendMsg(ircmsgs.IrcMsg('MODE %s +O' % irc.nick))
                 else:
@@ -745,8 +745,8 @@ class Sigyn(callbacks.Plugin,plugins.ChannelDBHandler):
     def addpattern (self,irc,msg,args,limit,life,pattern):
         """<limit> <life> <pattern>
 
-        add a permanent <pattern> : kline after <limit> calls raised during <life> seconds,
-        for immediate kline use limit 0"""
+        add a permanent <pattern> : gline after <limit> calls raised during <life> seconds,
+        for immediate gline use limit 0"""
         i = self.getIrc(irc)
         pattern = pattern.lower()
         result = i.add(self.getDb(irc.network),msg.prefix,pattern,limit,life,False)
@@ -757,8 +757,8 @@ class Sigyn(callbacks.Plugin,plugins.ChannelDBHandler):
     def addregexpattern (self,irc,msg,args,limit,life,pattern):
         """<limit> <life> /<pattern>/
 
-        add a permanent /<pattern>/ to kline after <limit> calls raised during <life> seconds,
-        for immediate kline use limit 0"""
+        add a permanent /<pattern>/ to gline after <limit> calls raised during <life> seconds,
+        for immediate gline use limit 0"""
         i = self.getIrc(irc)
         result = i.add(self.getDb(irc.network),msg.prefix,pattern[0],limit,life,True)
         self.logChannel(irc,'PATTERN: %s added #%s : "%s" %s/%ss' % (msg.nick,result,pattern[0],limit,life))
@@ -948,9 +948,9 @@ class Sigyn(callbacks.Plugin,plugins.ChannelDBHandler):
             irc.reply('unknown channel')
     rmtmp = wrap(rmtmp,['op'])
 
-    def unkline (self,irc,msg,args,nick):
+    def ungline (self,irc,msg,args,nick):
        """<nick>
-          request unkline of <nick>, klined recently from your channel
+          request ungline of <nick>, glined recently from your channel
        """
        channels = []
        ops = []
@@ -960,7 +960,7 @@ class Sigyn(callbacks.Plugin,plugins.ChannelDBHandler):
                chan = self.getChan(irc,channel)
                if len(chan.klines):
                    for q in chan.klines:
-                       self.log.info('klines found %s' % q)
+                       self.log.info('glines found %s' % q)
                        if q.startswith(nick):
                           ip = q.split(' ')[1]
                           channels.append(channel)
@@ -973,7 +973,7 @@ class Sigyn(callbacks.Plugin,plugins.ChannelDBHandler):
                                   if chan.patterns and len(chan.patterns):
                                       self.logChannel(irc,'PATTERN: [%s] removed %s tmp pattern by %s' % (channel,len(chan.patterns),msg.nick))
                                       chan.patterns.reset()
-                              self.logChannel(irc,'OP: [%s] %s unklined %s (%s)' % (channel,msg.nick,ip,nick))
+                              self.logChannel(irc,'OP: [%s] %s unglined %s (%s)' % (channel,msg.nick,ip,nick))
                               irc.reply('The ban on %s from %s has been lifted' % (nick,channel))
                           else:
                               self.logChannel(irc,'OP: [%s] %s asked for removal of %s (%s)' % (channel,msg.nick,ip,nick))
@@ -983,8 +983,8 @@ class Sigyn(callbacks.Plugin,plugins.ChannelDBHandler):
            if not len(channels):
                irc.replyError("'%s' does not match any recent bans from %s" % (nick,', '.join(ops)))
        else:
-           irc.replyError("Only **Opped** channel operators of the channel the ban originated in can remove k-lines. If you have any questions, contact IRC4Fun staff (#help)")
-    unkline = wrap(unkline,['private','text'])
+           irc.replyError("Only **Opped** channel operators of the channel the ban originated in can remove G-lines. If you have any questions, contact IRC4Fun staff (#help)")
+    ungline = wrap(ungline,['private','text'])
 
 
     def oper (self,irc,msg,args):
@@ -1438,16 +1438,16 @@ class Sigyn(callbacks.Plugin,plugins.ChannelDBHandler):
                h = host
             mask = self.prefixToMask(irc,'%s!%s@%s' % (nick,ident,h))
             if not self.registryValue('enable'):
-                self.logChannel(irc,"INFO: disabled, can't kline %s (%s)" % (mask,pending[3]))
+                self.logChannel(irc,"INFO: disabled, can't gline %s (%s)" % (mask,pending[3]))
                 if pending[1] in i.klines:
                     del i.klines[pending[1]]
                 return
             if not i.opered:
-                self.logChannel(irc,"INFO: not opered, can't kline %s (%s)" % (mask,pending[3]))
+                self.logChannel(irc,"INFO: not opered, can't gline %s (%s)" % (mask,pending[3]))
                 if pending[1] in i.klines:
                     del i.klines[pending[1]]
                 return
-            self.log.info('KLINE %s|%s' % (mask,pending[3]))
+            self.log.info('GLINE %s|%s' % (mask,pending[3]))
             if self.registryValue('useOperServ'):
                 irc.sendMsg(ircmsgs.IrcMsg('PRIVMSG OperServ :AKILL ADD +%s %s %s | %s' % (pending[2],mask,pending[4],pending[3])))
             else:
@@ -1461,7 +1461,7 @@ class Sigyn(callbacks.Plugin,plugins.ChannelDBHandler):
                        if k.startswith(nickLowered):
                            (at, m) = chan.klines.queue[index]
                            chan.klines.queue[index] = (at,'%s %s' % (nickLowered,mask))
-                           self.log.info('kline %s replaced at %s: %s / %s' % (m,index,nickLowered,mask))
+                           self.log.info('gline %s replaced at %s: %s / %s' % (m,index,nickLowered,mask))
                            break
                        index = index + 1
             if pending[1] in i.klines:
@@ -1472,7 +1472,7 @@ class Sigyn(callbacks.Plugin,plugins.ChannelDBHandler):
         if mask in i.klines:
             return
         if duration < 0:
-            self.log.info('Ignored kline %s due to no duration', mask)
+            self.log.info('Ignored gline %s due to no duration', mask)
             return
         if not klineMessage:
             klineMessage = self.registryValue('klineMessage')
@@ -1490,12 +1490,12 @@ class Sigyn(callbacks.Plugin,plugins.ChannelDBHandler):
                canKline = False
         else:
             self.log.info('INVALID PREFIX %s : %s : %s' % (prefix,mask,reason))
-        self.log.info('CANKLINE %s %s %s' % (prefix,mask,canKline))
+        self.log.info('CANGLINE %s %s %s' % (prefix,mask,canKline))
         if canKline:
             if not self.registryValue('enable'):
-                self.logChannel(irc,"INFO: disabled, can't kline %s (%s)" % (mask,reason))
+                self.logChannel(irc,"INFO: disabled, can't gline %s (%s)" % (mask,reason))
             else:
-                self.log.info('KLINE %s|%s' % (mask,reason))
+                self.log.info('GLINE %s|%s' % (mask,reason))
                 if self.registryValue('useOperServ'):
                     irc.sendMsg(ircmsgs.IrcMsg('PRIVMSG OperServ :AKILL ADD +%s %s %s | %s' % (duration,mask,klineMessage,reason)))
                 else:
@@ -1583,7 +1583,7 @@ class Sigyn(callbacks.Plugin,plugins.ChannelDBHandler):
     resync = wrap(resync,['owner'])
 
     def lethalaccount (self,irc,msg,args,text):
-        """<accountname> monitor account and kline it on sight
+        """<accountname> monitor account and gline it on sight
            during 24h, via extended-join, account-notify, account's name change"""
         i = self.getIrc(irc)
         account = text.lower().strip()
@@ -1777,8 +1777,8 @@ class Sigyn(callbacks.Plugin,plugins.ChannelDBHandler):
        if nick in i.toklineresults:
            if i.toklineresults[nick]['kind'] == 'evade':
                uid = random.randint(0,1000000)
-               irc.sendMsg(ircmsgs.IrcMsg('GLINE %s %s :%s|%s' % (i.toklineresults[nick]['mask'],self.registryValue('klineDuration'),self.registryValue('klineMessage'),'%s - kline evasion' % (uid))))
-               self.logChannel(irc,'BAD: [%s] %s (kline evasion)' % (i.toklineresults[nick]['hostmask'],uid))
+               irc.sendMsg(ircmsgs.IrcMsg('GLINE %s 6h :%s|%s' % (i.toklineresults[nick]['mask'],self.registryValue('klineMessage'),'%s - gline evasion' % (uid))))
+               self.logChannel(irc,'BAD: [%s] %s (gline evasion)' % (i.toklineresults[nick]['hostmask'],uid))
            del i.tokline[nick]
            del i.toklineresults[nick]
 
@@ -2014,7 +2014,7 @@ class Sigyn(callbacks.Plugin,plugins.ChannelDBHandler):
                 i.netsplit = False
                 self.logChannel(irc,"INFO: netsplit mode deactivated")
         if mask in i.klines:
-            self.log.debug('Ignoring %s (%s) - kline in progress', msg.prefix,mask)
+            self.log.debug('Ignoring %s (%s) - gline in progress', msg.prefix,mask)
             return
         isBanned = False
         for channel in targets.split(','):
@@ -2042,7 +2042,7 @@ class Sigyn(callbacks.Plugin,plugins.ChannelDBHandler):
                         if not i.defcon:
                             self.logChannel(irc,'INFO: [%s] returns to regular state' % channel)
                         if irc.isChannel(channel) and self.registryValue('defconMode',channel=channel) and not i.defcon:
-                            if 'z' in irc.state.channels[channel].modes and irc.nick in list(irc.state.channels[channel].ops) and not 'm' in irc.state.channels[channel].modes:
+                            if 'U' in irc.state.channels[channel].modes and irc.nick in list(irc.state.channels[channel].ops) and not 'M' in irc.state.channels[channel].modes:
                                 irc.queueMsg(ircmsgs.IrcMsg('MODE %s q' % channel))
                 if isBanned:
                     continue
@@ -2309,10 +2309,10 @@ class Sigyn(callbacks.Plugin,plugins.ChannelDBHandler):
                         if chan.called:
                             chan.called = time.time()
                         if i.lastDefcon and time.time()-i.lastDefcon < self.registryValue('alertPeriod') and not i.defcon:
-                            self.logChannel(irc,"INFO: ignores lifted and abuses end to klines for %ss due to abuses in %s after lastest defcon %s" % (self.registryValue('defcon')*2,channel,i.lastDefcon))
+                            self.logChannel(irc,"INFO: ignores lifted and abuses end to glines for %ss due to abuses in %s after lastest defcon %s" % (self.registryValue('defcon')*2,channel,i.lastDefcon))
                             i.defcon = time.time() + (self.registryValue('defcon')*2)
                             if not i.god:
-                                irc.sendMsg(ircmsgs.IrcMsg('MODE %s +p' % irc.nick))
+                                irc.sendMsg(ircmsgs.IrcMsg('MODE %s +O' % irc.nick))
                             else:
                                 self.applyDefcon(irc)
                         ip = mask.split('@')[1]
@@ -2471,7 +2471,7 @@ class Sigyn(callbacks.Plugin,plugins.ChannelDBHandler):
                                 self.logChannel(irc,"BOT: Wave in progress (%s/%ss), ignores lifted, triggers thresholds lowered for %ss at least" % (self.registryValue('reportPermit'),self.registryValue('reportLife'),self.registryValue('defcon')))
                                 i.defcon = time.time()
                                 if not i.god:
-                                    irc.sendMsg(ircmsgs.IrcMsg('MODE %s +p' % irc.nick))
+                                    irc.sendMsg(ircmsgs.IrcMsg('MODE %s +O' % irc.nick))
                                 else:
                                     self.applyDefcon (irc)
                             i.defcon = time.time()
@@ -2830,7 +2830,7 @@ class Sigyn(callbacks.Plugin,plugins.ChannelDBHandler):
                             found = chan.nicks[nick][4]
                             break
         if found:
-            self.log.info ('Account klined %s --> %s' % (found,user))
+            self.log.info ('Account glined %s --> %s' % (found,user))
         if permit > -1:
             if '/' in host:
                 if host.startswith('gateway/') or host.startswith('nat/'):
@@ -2846,7 +2846,7 @@ class Sigyn(callbacks.Plugin,plugins.ChannelDBHandler):
                 if len(queue) == permit:
                     if not announced:
                         announced = True
-                        self.logChannel(irc,"NOTE: a kline similar to *@%s seems to hit more than %s users" % (range,self.registryValue('alertOnWideKline')))
+                        self.logChannel(irc,"NOTE: a gline similar to *@%s seems to hit more than %s users" % (range,self.registryValue('alertOnWideKline')))
 
     def handleNickSnote (self,irc,text):
         text = text.replace('Nick change: From ','')
@@ -3125,7 +3125,7 @@ class Sigyn(callbacks.Plugin,plugins.ChannelDBHandler):
                 if not i.defcon:
                     i.defcon = time.time()
                     if not i.god:
-                        irc.sendMsg(ircmsgs.IrcMsg('MODE %s +p' % irc.nick))
+                        irc.sendMsg(ircmsgs.IrcMsg('MODE %s +O' % irc.nick))
                     else:
                         self.applyDefcon(irc)
             chan.called = time.time()
@@ -3492,17 +3492,17 @@ class Sigyn(callbacks.Plugin,plugins.ChannelDBHandler):
                         i.throttled = True
                         irc.queueMsg(ircmsgs.privmsg(channel,'NOTE: messages throttled to avoid spam for %ss' % life))
                         if not i.defcon:
-                            self.logChannel(irc,"INFO: ignores lifted and abuses end to klines for %ss due to abuses" % self.registryValue('defcon'))
+                            self.logChannel(irc,"INFO: ignores lifted and abuses end to glines for %ss due to abuses" % self.registryValue('defcon'))
                             if not i.god:
-                                irc.sendMsg(ircmsgs.IrcMsg('MODE %s +p' % irc.nick))
+                                irc.sendMsg(ircmsgs.IrcMsg('MODE %s +O' % irc.nick))
                             else:
                                 for channel in irc.state.channels:
                                     if irc.isChannel(channel) and self.registryValue('defconMode',channel=channel):
-                                        if not 'z' in irc.state.channels[channel].modes:
+                                        if not 'U' in irc.state.channels[channel].modes:
                                             if irc.nick in list(irc.state.channels[channel].ops):
-                                                irc.sendMsg(ircmsgs.IrcMsg('MODE %s +qz $~a' % channel))
+                                                irc.sendMsg(ircmsgs.IrcMsg('MODE %s +MU' % channel))
                                             else:
-                                                irc.sendMsg(ircmsgs.IrcMsg('MODE %s +oqz %s $~a' % (channel,irc.nick)))
+                                                irc.sendMsg(ircmsgs.IrcMsg('MODE %s +oMU %s' % (channel,irc.nick)))
 
                         i.defcon = time.time()
                 else:
