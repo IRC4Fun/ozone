@@ -1022,11 +1022,11 @@ class Sigyn(callbacks.Plugin,plugins.ChannelDBHandler):
             if irc.isChannel(channel) and self.registryValue('defconMode',channel=channel):
                 chan = self.getChan(irc,channel)
                 if i.defcon or chan.called:
-                    if not 'z' in irc.state.channels[channel].modes:
+                    if not 'U' in irc.state.channels[channel].modes:
                         if irc.nick in list(irc.state.channels[channel].ops):
                             irc.sendMsg(ircmsgs.IrcMsg('MODE %s +MU' % channel))
                         else:
-                            irc.sendMsg(ircmsgs.IrcMsg('MODE %s +oMU %s' % (channel,irc.nick)))
+                            irc.sendMsg(ircmsgs.IrcMsg('SAMODE %s +oMU %s' % (channel,irc.nick)))
 
 
 
@@ -1962,7 +1962,7 @@ class Sigyn(callbacks.Plugin,plugins.ChannelDBHandler):
                 if channel == self.registryValue('mainChannel'):
                     irc.sendMsg(ircmsgs.IrcMsg('MODE %s -MU' % channel))
                 else:
-                    irc.sendMsg(ircmsgs.IrcMsg('MODE %s -MUo %s' % (channel,irc.nick)))
+                    irc.sendMsg(ircmsgs.IrcMsg('SAMODE %s -MUo %s' % (channel,irc.nick)))
 
     def handleMsg (self,irc,msg,isNotice):
         if not ircutils.isUserHostmask(msg.prefix):
@@ -2007,7 +2007,7 @@ class Sigyn(callbacks.Plugin,plugins.ChannelDBHandler):
                 self.logChannel(irc,"INFO: triggers restored to normal behaviour")
                 for channel in irc.state.channels:
                     if irc.isChannel(channel) and self.registryValue('defconMode',channel=channel):
-                        if 'U' in irc.state.channels[channel].modes and irc.nick in list(irc.state.channels[channel].ops) and not 'm' in irc.state.channels[channel].modes:
+                        if 'U' in irc.state.channels[channel].modes and irc.nick in list(irc.state.channels[channel].ops) and not 'M' in irc.state.channels[channel].modes:
                             irc.queueMsg(ircmsgs.IrcMsg('MODE %s q' % channel))
         if i.netsplit:
             if time.time() > i.netsplit:
@@ -2140,7 +2140,7 @@ class Sigyn(callbacks.Plugin,plugins.ChannelDBHandler):
                     elif chan.buffers[kind][key].timeout != life:
                         chan.buffers[kind][key].setTimeout(life)
                     chan.buffers[kind][key].enqueue(key)
-                    if not isIgnored and isNew and len(chan.buffers[kind][key]) == 1 and text.startswith('http') and time.time()-chan.nicks[msg.nick][0] < 15 and 'z' in irc.state.channels[channel].modes and channel == '#IRC4Fun':
+                    if not isIgnored and isNew and len(chan.buffers[kind][key]) == 1 and text.startswith('http') and time.time()-chan.nicks[msg.nick][0] < 15 and 'U' in irc.state.channels[channel].modes and channel == '#IRC4Fun':
                         publicreason = 'link spam once joined'
                         reason = 'linkspam'
                 badunicode = False
@@ -3502,7 +3502,7 @@ class Sigyn(callbacks.Plugin,plugins.ChannelDBHandler):
                                             if irc.nick in list(irc.state.channels[channel].ops):
                                                 irc.sendMsg(ircmsgs.IrcMsg('MODE %s +MU' % channel))
                                             else:
-                                                irc.sendMsg(ircmsgs.IrcMsg('MODE %s +oMU %s' % (channel,irc.nick)))
+                                                irc.sendMsg(ircmsgs.IrcMsg('SAMODE %s +oMU %s' % (channel,irc.nick)))
 
                         i.defcon = time.time()
                 else:
@@ -3871,7 +3871,7 @@ class Sigyn(callbacks.Plugin,plugins.ChannelDBHandler):
                 if oldNick in chan.nicks:
                     chan.nicks[newNick] = chan.nicks[oldNick]
                     # todo check digit/hexa nicks too
-                    if not newNick.startswith('Guest'):
+                    if not newNick.startswith('User'):
                         if not isBanned:
                             reason = False
                             if self.registryValue('ignoreRegisteredUser',channel=channel):
