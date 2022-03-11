@@ -1279,7 +1279,8 @@ class Sigyn(callbacks.Plugin,plugins.ChannelDBHandler):
         if not i.opered:
             i.opered = True
             irc.queueMsg(ircmsgs.IrcMsg('MODE %s +O' % irc.nick))
-            irc.queueMsg(ircmsgs.IrcMsg('MODE %s +B' % irc.nick))
+            # Make sure ozone sets +N to not receive HISTORY playback on JOINs  --siniStar
+            irc.queueMsg(ircmsgs.IrcMsg('MODE %s +BN' % irc.nick))
 #            irc.queueMsg(ircmsgs.IrcMsg('CAP REQ :solanum.chat/realhost'))
             try:
                 conf.supybot.protocols.irc.throttleTime.setValue(0.0)
