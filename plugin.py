@@ -3769,10 +3769,10 @@ class Sigyn(callbacks.Plugin,plugins.ChannelDBHandler):
         if len(msg.args) == 1:
             reason = msg.args[0].lstrip().rstrip()
         i = self.getIrc(irc)
-        if reason == '*.net *.split':
-            if not i.netsplit:
-                self.logChannel(irc,'INFO: netsplit activated for %ss : some abuses are ignored' % self.registryValue('netsplitDuration'))
-            i.netsplit = time.time() + self.registryValue('netsplitDuration')
+#        if reason == '*.net *.split':
+#            if not i.netsplit:
+#                self.logChannel(irc,'INFO: netsplit activated for %ss : some abuses are ignored' % self.registryValue('netsplitDuration'))
+#            i.netsplit = time.time() + self.registryValue('netsplitDuration')
         if i.netsplit:
             return
         mask = self.prefixToMask(irc,msg.prefix)
