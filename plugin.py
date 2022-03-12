@@ -1026,7 +1026,7 @@ class Sigyn(callbacks.Plugin,plugins.ChannelDBHandler):
                         if irc.nick in list(irc.state.channels[channel].ops):
                             irc.sendMsg(ircmsgs.IrcMsg('MODE %s +MU' % channel))
                         else:
-                            irc.sendMsg(ircmsgs.IrcMsg('SAMODE %s +oMU %s' % (channel,irc.nick)))
+                            irc.sendMsg(ircmsgs.IrcMsg('MODE %s +oMU %s' % (channel,irc.nick)))
 
 
 
@@ -1280,7 +1280,7 @@ class Sigyn(callbacks.Plugin,plugins.ChannelDBHandler):
             i.opered = True
             irc.queueMsg(ircmsgs.IrcMsg('MODE %s +O' % irc.nick))
             # Make sure ozone sets +N to not receive HISTORY playback on JOINs  --siniStar
-            irc.queueMsg(ircmsgs.IrcMsg('MODE %s +BN' % irc.nick))
+            irc.queueMsg(ircmsgs.IrcMsg('MODE %s +HIBN' % irc.nick))
 #            irc.queueMsg(ircmsgs.IrcMsg('CAP REQ :solanum.chat/realhost'))
             try:
                 conf.supybot.protocols.irc.throttleTime.setValue(0.0)
@@ -1963,7 +1963,7 @@ class Sigyn(callbacks.Plugin,plugins.ChannelDBHandler):
                 if channel == self.registryValue('mainChannel'):
                     irc.sendMsg(ircmsgs.IrcMsg('MODE %s -MU' % channel))
                 else:
-                    irc.sendMsg(ircmsgs.IrcMsg('SAMODE %s -MUo %s' % (channel,irc.nick)))
+                    irc.sendMsg(ircmsgs.IrcMsg('MODE %s -MUo %s' % (channel,irc.nick)))
 
     def handleMsg (self,irc,msg,isNotice):
         if not ircutils.isUserHostmask(msg.prefix):
@@ -3503,7 +3503,7 @@ class Sigyn(callbacks.Plugin,plugins.ChannelDBHandler):
                                             if irc.nick in list(irc.state.channels[channel].ops):
                                                 irc.sendMsg(ircmsgs.IrcMsg('MODE %s +MU' % channel))
                                             else:
-                                                irc.sendMsg(ircmsgs.IrcMsg('SAMODE %s +oMU %s' % (channel,irc.nick)))
+                                                irc.sendMsg(ircmsgs.IrcMsg('MODE %s +oMU %s' % (channel,irc.nick)))
 
                         i.defcon = time.time()
                 else:
