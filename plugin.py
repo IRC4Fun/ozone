@@ -588,7 +588,7 @@ class Sigyn(callbacks.Plugin,plugins.ChannelDBHandler):
                 i.defcon = time.time()
                 self.logChannel(irc,"INFO: ignores lifted and abuses end to glines for %ss by %s" % (self.registryValue('defcon'),msg.nick))
                 if not i.god:
-                    irc.sendMsg(ircmsgs.IrcMsg('MODE %s +O' % irc.nick))
+                    irc.sendMsg(ircmsgs.IrcMsg('SAMODE %s +O' % irc.nick))
                 else:
                     self.applyDefcon (irc)
         irc.replySuccess()
@@ -1024,9 +1024,9 @@ class Sigyn(callbacks.Plugin,plugins.ChannelDBHandler):
                 if i.defcon or chan.called:
                     if not 'U' in irc.state.channels[channel].modes:
                         if irc.nick in list(irc.state.channels[channel].ops):
-                            irc.sendMsg(ircmsgs.IrcMsg('MODE %s +MU' % channel))
+                            irc.sendMsg(ircmsgs.IrcMsg('MODE %s +U' % channel))
                         else:
-                            irc.sendMsg(ircmsgs.IrcMsg('MODE %s +oMU %s' % (channel,irc.nick)))
+                            irc.sendMsg(ircmsgs.IrcMsg('SAMODE %s +oU %s' % (channel,irc.nick)))
 
 
 
@@ -1280,8 +1280,9 @@ class Sigyn(callbacks.Plugin,plugins.ChannelDBHandler):
             i.opered = True
             irc.queueMsg(ircmsgs.IrcMsg('MODE %s +O' % irc.nick))
             # Make sure ozone sets +N to not receive HISTORY playback on JOINs  --siniStar
-            irc.queueMsg(ircmsgs.IrcMsg('MODE %s +HIBN' % irc.nick))
-#            irc.queueMsg(ircmsgs.IrcMsg('CAP REQ :solanum.chat/realhost'))
+            irc.queueMsg(ircmsgs.IrcMsg('MODE %s +HIBN-h' % irc.nick))
+            irc.queueMsg(ircmsgs.IrcMsg('CAP REQ :inspircd.org/ip'))
+            irc.queueMsg(ircmsgs.IrcMsg('CAP REQ :inspircd.org/realhost'))
             try:
                 conf.supybot.protocols.irc.throttleTime.setValue(0.0)
             except:
@@ -1323,7 +1324,7 @@ class Sigyn(callbacks.Plugin,plugins.ChannelDBHandler):
                 (mode,value) = change
                 if mode == '+U':
                     if not irc.nick in list(irc.state.channels[target].ops):
-                        irc.queueMsg(ircmsgs.IrcMsg('PRIVMSG ChanServ :OP %s' % target))
+                        irc.queueMsg(ircmsgs.IrcMsg('SAMODE %s :+o %s' % target,irc.nick))
                     if target == self.registryValue('mainChannel'):
                         self.opStaffers(irc)
                 elif mode == '+b' or mode == '+b m:':
@@ -1961,9 +1962,9 @@ class Sigyn(callbacks.Plugin,plugins.ChannelDBHandler):
         if self.registryValue('defconMode',channel=channel) and not i.defcon:
             if op == irc.prefix:
                 if channel == self.registryValue('mainChannel'):
-                    irc.sendMsg(ircmsgs.IrcMsg('MODE %s -MU' % channel))
+                    irc.sendMsg(ircmsgs.IrcMsg('MODE %s -U' % channel))
                 else:
-                    irc.sendMsg(ircmsgs.IrcMsg('MODE %s -MUo %s' % (channel,irc.nick)))
+                    irc.sendMsg(ircmsgs.IrcMsg('SAMODE %s -Uo %s' % (channel,irc.nick)))
 
     def handleMsg (self,irc,msg,isNotice):
         if not ircutils.isUserHostmask(msg.prefix):
@@ -1981,11 +1982,11 @@ class Sigyn(callbacks.Plugin,plugins.ChannelDBHandler):
             raw = text
         text = raw.lower()
         ip = None
-#        if 'solanum.chat/ip' in msg.server_tags:
-#            ip = msg.server_tags['solanum.chat/ip']
-#        if ip is None:
-#            if 'solanum.chat/realhost' in msg.server_tags:
-#                ip = msg.server_tags['solanum.chat/realhost']
+        if 'inspircd.org/ip' in msg.server_tags:
+            ip = msg.server_tags['inspircd.org/ip']
+        if ip is None:
+            if 'inspircd.org/realhost' in msg.server_tags:
+                ip = msg.server_tags['inspircd.org/realhost']
         mask = None
         if ip:
             (ni,ident,hos) = ircutils.splitHostmask(msg.prefix)
@@ -2009,7 +2010,7 @@ class Sigyn(callbacks.Plugin,plugins.ChannelDBHandler):
                 for channel in irc.state.channels:
                     if irc.isChannel(channel) and self.registryValue('defconMode',channel=channel):
                         if 'U' in irc.state.channels[channel].modes and irc.nick in list(irc.state.channels[channel].ops) and not 'm' in irc.state.channels[channel].modes:
-                            irc.queueMsg(ircmsgs.IrcMsg('MODE %s q' % channel))
+                            irc.queueMsg(ircmsgs.IrcMsg('MODE %s b' % channel))
         if i.netsplit:
             if time.time() > i.netsplit:
                 i.netsplit = False
@@ -2044,7 +2045,7 @@ class Sigyn(callbacks.Plugin,plugins.ChannelDBHandler):
                             self.logChannel(irc,'INFO: [%s] returns to regular state' % channel)
                         if irc.isChannel(channel) and self.registryValue('defconMode',channel=channel) and not i.defcon:
                             if 'U' in irc.state.channels[channel].modes and irc.nick in list(irc.state.channels[channel].ops) and not 'm' in irc.state.channels[channel].modes:
-                                irc.queueMsg(ircmsgs.IrcMsg('MODE %s q' % channel))
+                                irc.queueMsg(ircmsgs.IrcMsg('MODE %s b' % channel))
                 if isBanned:
                     continue
                 if msg.nick in list(irc.state.channels[channel].ops):
@@ -3501,9 +3502,9 @@ class Sigyn(callbacks.Plugin,plugins.ChannelDBHandler):
                                     if irc.isChannel(channel) and self.registryValue('defconMode',channel=channel):
                                         if not 'U' in irc.state.channels[channel].modes:
                                             if irc.nick in list(irc.state.channels[channel].ops):
-                                                irc.sendMsg(ircmsgs.IrcMsg('MODE %s +MU' % channel))
+                                                irc.sendMsg(ircmsgs.IrcMsg('MODE %s +U' % channel))
                                             else:
-                                                irc.sendMsg(ircmsgs.IrcMsg('MODE %s +oMU %s' % (channel,irc.nick)))
+                                                irc.sendMsg(ircmsgs.IrcMsg('SAMODE %s +oU %s' % (channel,irc.nick)))
 
                         i.defcon = time.time()
                 else:
@@ -3534,11 +3535,11 @@ class Sigyn(callbacks.Plugin,plugins.ChannelDBHandler):
         ip = None
         if 'account' in msg.server_tags:
             account = msg.server_tags['account']
-        if 'solanum.chat/ip' in msg.server_tags:
-            ip = msg.server_tags['solanum.chat/ip']
+        if 'inspircd.org/ip' in msg.server_tags:
+            ip = msg.server_tags['inspircd.org/ip']
         if ip is None:
-            if 'solanum.chat/realhost' in msg.server_tags:
-                ip = msg.server_tags['solanum.chat/realhost']
+            if 'inspircd.org/realhost' in msg.server_tags:
+                ip = msg.server_tags['inspircd.org/realhost']
 
         if len(msg.args) > 1:
             gecos = msg.args[2]
@@ -3852,9 +3853,9 @@ class Sigyn(callbacks.Plugin,plugins.ChannelDBHandler):
         if oldNick == irc.nick or newNick == irc.nick:
             return
         (nn,ii,hh) = ircutils.splitHostmask(msg.prefix)
-#        ip = hh
-#        if 'solanum.chat/ip' in msg.server_tags:
-#            ip = msg.server_tags['solanum.chat/ip']
+        ip = hh
+        if 'inspircd.org/ip' in msg.server_tags:
+            ip = msg.server_tags['inspircd.org/ip']
         newPrefix = '%s!%s@%s' % (newNick,ii,hh)
         mask = self.prefixToMask(irc,newPrefix)
         i = self.getIrc(irc)
