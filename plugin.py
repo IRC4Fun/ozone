@@ -588,7 +588,7 @@ class Sigyn(callbacks.Plugin,plugins.ChannelDBHandler):
                 i.defcon = time.time()
                 self.logChannel(irc,"INFO: ignores lifted and abuses end to glines for %ss by %s" % (self.registryValue('defcon'),msg.nick))
                 if not i.god:
-                    irc.sendMsg(ircmsgs.IrcMsg('SAMODE %s +O' % irc.nick))
+                    irc.sendMsg(ircmsgs.IrcMsg('MODE %s +O' % irc.nick))
                 else:
                     self.applyDefcon (irc)
         irc.replySuccess()
