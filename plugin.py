@@ -2022,7 +2022,7 @@ class Sigyn(callbacks.Plugin,plugins.ChannelDBHandler):
                 self.logChannel(irc,"INFO: triggers restored to normal behaviour")
                 for channel in irc.state.channels:
                     if irc.isChannel(channel) and self.registryValue('defconMode',channel=channel):
-                        if 'U' in irc.state.channels[channel].modes and irc.nick in list(irc.state.channels[channel].ops) and not 'm' in irc.state.channels[channel].modes:
+                        if 'U' in irc.state.channels[channel].modes and irc.nick in list(irc.state.channels[channel].ops):
                             irc.queueMsg(ircmsgs.IrcMsg('MODE %s b' % channel))
         if i.netsplit:
             if time.time() > i.netsplit:
@@ -2057,7 +2057,7 @@ class Sigyn(callbacks.Plugin,plugins.ChannelDBHandler):
                         if not i.defcon:
                             self.logChannel(irc,'INFO: [%s] returns to regular state' % channel)
                         if irc.isChannel(channel) and self.registryValue('defconMode',channel=channel) and not i.defcon:
-                            if 'U' in irc.state.channels[channel].modes and irc.nick in list(irc.state.channels[channel].ops) and not 'm' in irc.state.channels[channel].modes:
+                            if 'U' in irc.state.channels[channel].modes and irc.nick in list(irc.state.channels[channel].ops):
                                 irc.queueMsg(ircmsgs.IrcMsg('MODE %s b' % channel))
                 if isBanned:
                     continue
