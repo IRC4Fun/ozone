@@ -2465,7 +2465,7 @@ class Sigyn(callbacks.Plugin,plugins.ChannelDBHandler):
         nicks = self.registryValue('reportNicks')
         if msg.nick in nicks:
             i = self.getIrc(irc)
-            if text.startswith('DNSBL:') and not '(tor' in text:
+            if text.startswith('DNSBL:'):
                 permit = self.registryValue('reportPermit')
                 if permit > -1:
                     life = self.registryValue('reportLife')
