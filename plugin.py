@@ -1438,8 +1438,8 @@ class Sigyn(callbacks.Plugin,plugins.ChannelDBHandler):
             return
         if not reason:
             reason = self.registryValue('killMessage')
-        irc.sendMsg(ircmsgs.IrcMsg('KILL %s :%s' % (nick,reason)))
-        #irc.sendMsg(ircmsgs.IrcMsg('PRIVMSG OperServ :AKILL ADD +5h %s Please do not spam channels or users on IRC4Fun. If in error, contact Help@IRC4Fun.net' % (nick)))
+        #irc.sendMsg(ircmsgs.IrcMsg('KILL %s :%s' % (nick,reason)))
+        irc.sendMsg(ircmsgs.IrcMsg('PRIVMSG OperServ :AKILL ADD +5h %s Please do not spam channels or users on IRC4Fun. If in error, contact support@IRC4Fun.net' % (nick)))
 
     def do338 (self,irc,msg):
         i = self.getIrc(irc)
@@ -1468,7 +1468,6 @@ class Sigyn(callbacks.Plugin,plugins.ChannelDBHandler):
                 irc.sendMsg(ircmsgs.IrcMsg('PRIVMSG OperServ :AKILL ADD +%s %s %s | %s' % (pending[2],mask,pending[4],pending[3])))
             else:
                 irc.sendMsg(ircmsgs.IrcMsg('GLINE %s %s :%s|%s' % (mask,pending[2],pending[4],pending[3])))
-                irc.sendMsg(ircmsgs.IrcMsg('GLINE *@%s %s :%s|%s' % (host,pending[2],pending[4],pending[3])))
             nickLowered = nick.lower()
             for channel in irc.state.channels:
                 chan = self.getChan(irc,channel)
