@@ -1438,7 +1438,8 @@ class Sigyn(callbacks.Plugin,plugins.ChannelDBHandler):
             return
         if not reason:
             reason = self.registryValue('killMessage')
-        irc.sendMsg(ircmsgs.IrcMsg('PRIVMSG OperServ :AKILL ADD +5h %s Please do not spam channels or users on IRC4Fun. If in error, contact Help@IRC4Fun.net' % (nick)))
+        irc.sendMsg(ircmsgs.IrcMsg('KILL %s :%s' % (nick,reason)))
+        #irc.sendMsg(ircmsgs.IrcMsg('PRIVMSG OperServ :AKILL ADD +5h %s Please do not spam channels or users on IRC4Fun. If in error, contact Help@IRC4Fun.net' % (nick)))
 
     def do338 (self,irc,msg):
         i = self.getIrc(irc)
