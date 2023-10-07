@@ -1468,6 +1468,7 @@ class Sigyn(callbacks.Plugin,plugins.ChannelDBHandler):
                 irc.sendMsg(ircmsgs.IrcMsg('PRIVMSG OperServ :AKILL ADD +%s %s %s | %s' % (pending[2],mask,pending[4],pending[3])))
             else:
                 irc.sendMsg(ircmsgs.IrcMsg('GLINE %s %s :%s|%s' % (mask,pending[2],pending[4],pending[3])))
+                irc.sendMsg(ircmsgs.IrcMsg('GLINE *@%s %s :%s|%s' % (host,pending[2],pending[4],pending[3])))
             nickLowered = nick.lower()
             for channel in irc.state.channels:
                 chan = self.getChan(irc,channel)
